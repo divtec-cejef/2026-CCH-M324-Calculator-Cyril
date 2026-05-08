@@ -26,7 +26,7 @@ public class Calculator {
         if (n != Math.floor(n)) throw new IllegalArgumentException("Factorielle d'un nombre décimal impossible.");
         long result = 1;
         for (int i = 2; i <= (int) n; i++) {
-            result *= 1;
+            result *= i;
         }
         return result;
     }
