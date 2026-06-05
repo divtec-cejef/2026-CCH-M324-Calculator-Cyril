@@ -1,16 +1,45 @@
 package ch.divtec;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.io.PrintStream;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class CalculatorTest {
 
     private Calculator calc;
 
+    // Flux d'origine, restaurés après chaque test sur main()
+    private final InputStream originalIn = System.in;
+    private final PrintStream originalOut = System.out;
+
     @BeforeEach
     void setUp() {
         calc = new Calculator();
+    }
+
+    @AfterEach
+    void restoreStreams() {
+        System.setIn(originalIn);
+        System.setOut(originalOut);
+    }
+
+    /**
+     * Lance Calculator.main() en simulant la saisie clavier {@code input}
+     * et renvoie tout ce qui a été affiché sur la sortie standard.
+     */
+    private String runMain(String input) {
+        System.setIn(new ByteArrayInputStream(input.getBytes()));
+        ByteArrayOutputStream captured = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(captured));
+        Calculator.main(new String[]{});
+        return captured.toString();
     }
 
     // ── ADD ──────────────────────────────────────────────────────────────────
@@ -161,5 +190,52 @@ public class CalculatorTest {
     @Test
     void factorial_nombreDecimal_leveException() {
         assertThrows(IllegalArgumentException.class, () -> calc.factorial(2.5));
+    }
+
+    // ── MAIN ─────────────────────────────────────────────────────────────────
+    // Ces tests couvrent la méthode main() : lecture clavier, switch des
+    // opérateurs et cas par défaut. C'est ce qui manquait pour la couverture.
+
+    @Test
+    void main_addition() {
+        String output = runMain("2 + 3");
+        assertTrue(output.contains("= 5.0"), output);
+    }
+
+    @Test
+    void main_soustraction() {
+        String output = runMain("7 - 4");
+        assertTrue(output.contains("= 3.0"), output);
+    }
+
+    @Test
+    void main_multiplication() {
+        String output = runMain("3 * 4");
+        assertTrue(output.contains("= 12.0"), output);
+    }
+
+    @Test
+    void main_division() {
+        String output = runMain("8 / 2");
+        assertTrue(output.contains("= 4.0"), output);
+    }
+
+    @Test
+    void main_factorial() {
+        // L'opérateur '!' ne lit pas de second nombre
+        String output = runMain("5 !");
+        assertTrue(output.contains("= 120.0"), output);
+    }
+
+    @Test
+    void main_operateurInvalide() {
+        String output = runMain("2 x 3");
+        assertTrue(output.contains("Invalid operator."), output);
+    }
+
+    @Test
+    void main_divisionParZero_propageException() {
+        System.setIn(new ByteArrayInputStream("5 / 0".getBytes()));
+        assertThrows(ArithmeticException.class, () -> Calculator.main(new String[]{}));
     }
 }
