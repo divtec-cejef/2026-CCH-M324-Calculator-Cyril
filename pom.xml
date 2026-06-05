@@ -20,7 +20,8 @@
         <!-- ===== SonarQube ===== -->
         <!-- Clé unique du projet (évite les collisions si plusieurs élèves
              poussent vers le même serveur SonarQube) -->
-        <sonar.projectKey>ch.divtec:simple-calculator</sonar.projectKey>
+        <sonar.projectKey>ch.divtec:simple-calculator-Cyril</sonar.projectKey>
+        <sonar.projectName>Calculator - Cyril</sonar.projectName>
         <!-- Chemin du rapport de couverture généré par JaCoCo (phase test) -->
         <sonar.coverage.jacoco.xmlReportPaths>${project.build.directory}/site/jacoco/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
         <!-- NOTE : on ne met PAS sonar.host.url ni le token ici.
